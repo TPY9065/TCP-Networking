@@ -15,33 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\server\TCP_Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\test\test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\TCP_Client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\connection\Connection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\server\TCP_Server.h">
+    <ClInclude Include="src\server\tcp_server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\TCP_Client.h">
+    <ClInclude Include="src\client\tcp_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\connection\Connection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\connection\MessageQueue.h">
+    <ClInclude Include="src\connection\connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
