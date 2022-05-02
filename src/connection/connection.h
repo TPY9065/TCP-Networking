@@ -13,6 +13,7 @@ namespace net
 	{
 	public:
 		Connection(size_t id, asio::io_context& io_context, tcp::socket socket, MessageQueue<T>& messageQueue);
+		// Perform an asynchronous connection to the endpoints, ConnectionHandler will be called if connection is successful.
 		void ConnectToServer(const tcp::resolver::results_type& endpoints);
 		void ConnectToClient();
 		void Disconnect();
@@ -20,25 +21,27 @@ namespace net
 		void WriteMessage(const Message<T>& message);
 		bool IsOpen() const;
 		size_t GetId() const;
-	private:
-		void ReadMessageHeader();
-		void ReadMessageBody();
-		void WriteMessageHeader();
-		void WriteMessageBody();
-		void ConnectionHandler(const asio::error_code& error, const tcp::endpoint& endpoint);
+	protected:
+		// Perform an asynchronous read and write operation from the connection
+		virtual void ReadMessageHeader();
+		virtual void ReadMessageBody();
+		virtual void WriteMessageHeader();
+		virtual void WriteMessageBody();
+		// Callback function when connection succeed.
+		virtual void ConnectionHandler(const asio::error_code& error, const tcp::endpoint& endpoint);
 		// If header is received successfully, resize the buffer size of the body of message in, 
 		// and start waiting the message body. Otherwise, discard current message and wait for next message header.
-		void ReadHeaderHandler(const asio::error_code& error, size_t bytes_transferred);
+		virtual void ReadHeaderHandler(const asio::error_code& error, size_t bytes_transferred);
 		// If body is received successfully, add the received message to the message queue. Then wait 
 		// for the next message header. Otherwise, discard current message and wait for next message header.
-		void ReadBodyHandler(const asio::error_code& error, size_t bytes_transferred);
+		virtual void ReadBodyHandler(const asio::error_code& error, size_t bytes_transferred);
 		// If header is sent successfully, send the message body.
 		// Otherwise, resent current message header. If error occurred, diconnect current connection.
-		void WriteHeaderHandler(const asio::error_code& error, size_t bytes_transferred);
+		virtual void WriteHeaderHandler(const asio::error_code& error, size_t bytes_transferred);
 		// If body is sent successfully, send next message header.
 		// Otherwise, resent current message header until client received. If error occurred,
 		// disconnect current connection.
-		void WriteBodyHandler(const asio::error_code& error, size_t bytes_transferred);
+		virtual void WriteBodyHandler(const asio::error_code& error, size_t bytes_transferred);
 		void LogError(const asio::error_code& error, const std::string_view& functor);
 	protected:
 		size_t m_id;

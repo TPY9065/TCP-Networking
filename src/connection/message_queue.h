@@ -1,7 +1,4 @@
 #pragma once
-
-#ifndef _MESSAGE_QUEUE_H_
-#define _MESSAGE_QUEUE_H_
 #include <iostream>
 #include <queue>
 #include "core.hpp"
@@ -90,13 +87,21 @@ namespace net
 	class MessageQueue
 	{
 	public:
+		// Gets the first received message in the queue.
 		Message<T> ReadMessageIn();
+		// Adds a new received message into the queue.
 		void WriteMessageIn(const Message<T>& message);
+		// Gets the next message that will be sent in the queue.
 		Message<T> ReadMessageOut();
+		// Adds a new message that will be sent into the queue.
 		void WriteMessageOut(const Message<T>& message);
+		// Removes the first received message in the queue.
 		void PopMessageIn();
+		// Removes the first sent message in the queue.
 		void PopMessageOut();
+		// Returns true if the received message queue is empty, otherwise false.
 		bool MessageInEmpty();
+		// Returns true if the sent message queue is empty, otherwise false.
 		bool MessageOutEmpty();
 	private:
 		std::queue<Message<T>> m_messages_in;
@@ -164,8 +169,6 @@ namespace net
 		return m_messages_out.empty();
 	}
 }
-
-#endif
 
 
 

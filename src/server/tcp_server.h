@@ -30,7 +30,9 @@ namespace net
 		virtual void OnClientDisconnect(ConnectionPtr connection);
 		virtual void HandleMessage();
 	private:
+		// Start an asynchronous accept.
 		void StartAccept();
+		// Callback function that will be called where there is a new connection arrived.
 		void HandleAccept(const asio::error_code& error, tcp::socket peer);
 	protected:
 		std::unordered_map<size_t, ConnectionPtr> m_connections;
