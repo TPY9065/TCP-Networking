@@ -23,7 +23,7 @@ namespace net
 		void Start();
 	protected:
 		using ConnectionPtr = std::shared_ptr<Connection<T>>;
-		// This function will be called where there is a new connection request accepted.
+		// This function will be called when there is a new connection request.
 		// Users can override this class for further processing. The newly accepted
 		// connection will be passed as the argument of this function.
 		virtual void OnClientConnect(ConnectionPtr& new_connection);
@@ -35,12 +35,12 @@ namespace net
 	protected:
 		std::unordered_map<size_t, ConnectionPtr> m_connections;
 		MessageQueue<T> m_message_queue;
+		size_t m_connection_count;
+		size_t m_id;
 	private:
 		asio::io_context m_io_context;
 		tcp::acceptor m_acceptor;
 		std::thread m_thread;
-		size_t m_connection_count;
-		size_t m_id;
 	};
 
 	template<Protocal T>
@@ -72,36 +72,7 @@ namespace net
 	template<Protocal T>
 	void TcpServer<T>::OnClientConnect(ConnectionPtr& new_connection)
 	{
-		Message<T> message;
-		message.body.push_back(m_connection_count + m_id);
-		message.header.size = message.body.size() + sizeof(size_t);
 
-		new_connection->WriteMessage(message);
-		new_connection->ReadMessage();
-
-		std::vector<size_t> dead_connections_id;
-		for (auto& [id, conn] : m_connections)
-		{
-			if (conn->IsOpen())
-			{
-				conn->WriteMessage(message);
-			}
-			else
-			{
-				conn->Disconnect();
-				dead_connections_id.push_back(id);
-			}
-		}
-
-		for (auto id : dead_connections_id)
-		{
-			m_connections[id].reset();
-			m_connections.erase(id);
-		}
-
-		m_connections[m_connection_count + m_id] = std::move(new_connection);
-		m_connection_count += 1;
-		std::cout << "Connections = " << m_connections.size() << std::endl;
 	}
 
 	template<Protocal T>

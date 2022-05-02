@@ -27,5 +27,8 @@
     <ClInclude Include="src\connection\connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\connection\message_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

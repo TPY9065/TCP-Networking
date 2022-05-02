@@ -27,6 +27,7 @@ namespace net
 	protected:
 		std::shared_ptr<Connection<T>> m_connection;
 		MessageQueue<T> m_messages_queue;
+		size_t m_id;
 	private:
 		asio::io_context m_io_context;
 		std::thread m_thread;
@@ -45,7 +46,7 @@ namespace net
 		{
 			tcp::resolver resolver(m_io_context);
 			tcp::resolver::results_type endpoints = resolver.resolve(host, port);
-			m_connection = std::make_shared<Connection<T>>(1000, m_io_context, tcp::socket(m_io_context), m_messages_queue);
+			m_connection = std::make_shared<Connection<T>>(-1, m_io_context, tcp::socket(m_io_context), m_messages_queue);
 			m_connection->ConnectToServer(endpoints);
 			m_thread = std::thread([this]() { m_io_context.run(); });
 			return true;

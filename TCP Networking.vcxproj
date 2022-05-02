@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="src\connection\connection.h" />
     <ClInclude Include="src\client\tcp_client.h" />
+    <ClInclude Include="src\connection\message_queue.h" />
     <ClInclude Include="src\core.hpp" />
     <ClInclude Include="src\server\tcp_server.h" />
   </ItemGroup>

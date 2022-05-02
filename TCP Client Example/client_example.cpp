@@ -15,9 +15,7 @@ public:
 			if (!m_messages_queue.MessageInEmpty())
 			{
 				net::Message<Protocal> message = m_messages_queue.ReadMessageIn();
-				std::cout << "Message sent from server: ";
-				for (size_t data : message.body)
-					std::cout << data << " ";
+				std::cout << "Message sent from server: \n" << message.to_json() << std::endl;
 				m_messages_queue.PopMessageIn();
 			}
 		}

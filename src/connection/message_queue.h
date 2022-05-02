@@ -2,6 +2,7 @@
 
 #ifndef _MESSAGE_QUEUE_H_
 #define _MESSAGE_QUEUE_H_
+#include <iostream>
 #include <queue>
 #include "core.hpp"
 
@@ -10,9 +11,9 @@ namespace net
 	template<Protocal T>
 	struct Header
 	{
-		size_t size;
-		size_t from;
-		size_t dest;
+		size_t size = 0;
+		size_t from = 0;
+		size_t dest = 0;
 		T protocal;
 	};
 
@@ -24,11 +25,62 @@ namespace net
 		Header<T> header;
 		std::vector<byte> body;
 
-		Message<T>& operator=(const std::vector<byte>& data)
+		// Factory method for constructing message in a easier way
+		static Message<T> ConstructMessage(T protocal, size_t from, size_t dest, const std::vector<byte>& data)
 		{
-			body = data;
-			header.size = data.size() * sizeof(byte);
+			Message<T> message;
+			message.header.protocal = protocal;
+			message.header.from = from;
+			message.header.dest = dest;
+			message.body = data;
+			message.header.size = data.size();
+			return message;
+		}
+
+		static Message<T> ConstructMessage(T protocal, const std::vector<byte>& data)
+		{
+			Message<T> message;
+			message.header.protocal = protocal;
+			message.body = data;
+			message.header.size = data.size();
+			return message;
+		}
+
+		// Returns the size of data in bytes
+		size_t size_in_bytes()
+		{
+			return body.size() * sizeof(byte);
+		};
+
+		// Functions for user to write data in a easier way with operator<<, size of header will be re-calculated.
+		Message<T>& operator<<(std::vector<byte> datas)
+		{
+			body = datas;
+			header.size = body.size();
 			return *this;
+		}
+
+		// Same as above, push append one data into body everytime.
+		Message<T>& operator<<(byte data)
+		{
+			body.push_back(data);
+			header.size = body.size();
+			return *this;
+		}
+
+		// Output the message in json format
+		std::string to_json()
+		{
+			std::string json =
+				"{\n  header: \n    size: " + std::to_string(header.size) +
+				 "\n    from: " + std::to_string(header.from) +
+				 "\n    dest: " + std::to_string(header.dest) + 
+				 "\n  body: \n    data: ";
+			for (byte data : body)
+				json += std::to_string(data);
+			json = json + "\n" + "}";
+
+			return json;
 		}
 	};
 

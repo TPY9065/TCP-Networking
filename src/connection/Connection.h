@@ -17,8 +17,9 @@ namespace net
 		void ConnectToClient();
 		void Disconnect();
 		void ReadMessage();
-		void WriteMessage(Message<T>& message);
+		void WriteMessage(const Message<T>& message);
 		bool IsOpen() const;
+		size_t GetId() const;
 	private:
 		void ReadMessageHeader();
 		void ReadMessageBody();
@@ -86,7 +87,7 @@ namespace net
 	}
 
 	template<Protocal T>
-	void Connection<T>::WriteMessage(Message<T>& message)
+	void Connection<T>::WriteMessage(const Message<T>& message)
 	{
 		m_message_queue.WriteMessageOut(message);
 		WriteMessageHeader();
@@ -99,6 +100,12 @@ namespace net
 	}
 
 	template<Protocal T>
+	size_t Connection<T>::GetId() const
+	{
+		return m_id;
+	}
+
+	template<Protocal T>
 	void Connection<T>::ReadMessageHeader()
 	{
 		asio::async_read(m_socket, asio::buffer(&m_message_in.header, sizeof(Header<T>)),
@@ -108,7 +115,7 @@ namespace net
 	template<Protocal T>
 	void Connection<T>::ReadMessageBody()
 	{
-		asio::async_read(m_socket, asio::buffer(m_message_in.body.data(), m_message_in.body.size()),
+		asio::async_read(m_socket, asio::buffer(m_message_in.body.data(), m_message_in.body.size() * sizeof(Message<T>::byte)),
 			std::bind(&Connection::ReadBodyHandler, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
@@ -126,7 +133,7 @@ namespace net
 	template<Protocal T>
 	void Connection<T>::WriteMessageBody()
 	{
-		asio::async_write(m_socket, asio::buffer(m_message_out.body.data(), m_message_out.body.size()),
+		asio::async_write(m_socket, asio::buffer(m_message_out.body.data(), m_message_out.body.size() * sizeof(Message<T>::byte)),
 			std::bind(&Connection::WriteBodyHandler, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
@@ -170,7 +177,7 @@ namespace net
 	{
 		if (!error)
 		{
-			if (m_message_in.body.size() == bytes_transferred)
+			if (m_message_in.size_in_bytes() == bytes_transferred)
 			{
 				m_message_queue.WriteMessageIn(m_message_in);
 			}
@@ -209,7 +216,7 @@ namespace net
 	{
 		if (!error)
 		{
-			if (m_message_out.body.size() == bytes_transferred)
+			if (m_message_out.size_in_bytes() == bytes_transferred)
 			{
 				m_message_queue.PopMessageOut();
 			}
